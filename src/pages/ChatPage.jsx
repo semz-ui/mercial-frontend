@@ -32,10 +32,6 @@ const ChatPage = () => {
   const showToast = useShowToast();
   const { socket, onlineUsers } = useSocket();
 
-  let width = screen.width;
-
-  console.log(width);
-
   useEffect(() => {
     socket?.on("messagesSeen", ({ conversationId }) => {
       setConversation((prev) => {
@@ -127,7 +123,6 @@ const ChatPage = () => {
     };
     getConversations();
   }, [showToast, setConversation]);
-  console.log(selectedConversation._id, "em");
   return (
     <Box
       position={"absolute"}

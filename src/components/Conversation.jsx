@@ -24,7 +24,6 @@ const Conversation = ({ conversation, isOnline }) => {
   );
   const user = conversation?.participants[0];
   const lastMessage = conversation?.lastMessage;
-  console.log(conversation);
   return (
     <Flex
       gap={4}
