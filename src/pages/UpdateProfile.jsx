@@ -42,13 +42,16 @@ export default function UserProfile() {
     if (updating) return true;
     setUpdating(true);
     try {
-      const response = await fetch(`/api/users/update/${user._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...inputs, profilePic: imgUrl }),
-      });
+      const response = await fetch(
+        `https://mercial-backend.onrender.com/api/users/update/${user._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...inputs, profilePic: imgUrl }),
+        }
+      );
       const data = await response.json();
       console.log(data);
       if (data.error) {
