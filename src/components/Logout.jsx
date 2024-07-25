@@ -15,12 +15,15 @@ const Logout = () => {
   const handleLogout = async () => {
     startLoader();
     try {
-      const res = await fetch("/api/users/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await fetch(
+        "https://mercial-backend.onrender.com/api/users/logout",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const data = await res.json();
       if (data.error) {
         showToast("Error", data.error, "error");

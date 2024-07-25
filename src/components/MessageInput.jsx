@@ -40,17 +40,20 @@ const MessageInput = ({ setMessages }) => {
     if (!messageText && !imgUrl) return;
     if (loading) return;
     try {
-      const res = await fetch("/api/message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: messageText,
-          recipientId: selectedConversation.userId,
-          img: imgUrl,
-        }),
-      });
+      const res = await fetch(
+        "https://mercial-backend.onrender.com/api/message",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: messageText,
+            recipientId: selectedConversation.userId,
+            img: imgUrl,
+          }),
+        }
+      );
       const data = await res.json();
       if (data.error) {
         showToast("Error", data.error, "error");

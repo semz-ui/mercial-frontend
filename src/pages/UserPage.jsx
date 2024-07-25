@@ -23,7 +23,9 @@ function UserPage() {
     if (!user) return;
     startLoader();
     try {
-      const response = await fetch(`/api/posts/user/${username}`);
+      const response = await fetch(
+        `https://mercial-backend.onrender.com/api/posts/user/${username}`
+      );
       const data = await response.json();
       if (data.error) {
         showToast("Error", data.error, "error");

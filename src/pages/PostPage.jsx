@@ -34,7 +34,9 @@ const PostPage = () => {
     const getPost = async () => {
       setPost([]);
       try {
-        const response = await fetch(`/api/posts/${pId}`);
+        const response = await fetch(
+          `https://mercial-backend.onrender.com/api/posts/${pId}`
+        );
         const data = await response.json();
         if (data.error) {
           showToast("Error", data.error, "error");
@@ -51,9 +53,13 @@ const PostPage = () => {
     try {
       e.preventDefault();
       if (!window.confirm("Are you sure you want to delete this post?")) return;
-      const res = await fetch("/api/posts/delete/" + currentPost._id, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        "https://mercial-backend.onrender.com/api/posts/delete/" +
+          currentPost._id,
+        {
+          method: "DELETE",
+        }
+      );
       const data = await res.json();
       if (data.error) {
         return showToast("Error", data.error, "error");

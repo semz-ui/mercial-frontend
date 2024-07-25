@@ -21,7 +21,9 @@ const Post = ({ post, postedBy }) => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const response = await fetch(`/api/users/profile/${postedBy}`);
+        const response = await fetch(
+          `https://mercial-backend.onrender.com/api/users/profile/${postedBy}`
+        );
         const data = await response.json();
         if (data.error) {
           showToast("Error", data.error, "error");
@@ -41,9 +43,12 @@ const Post = ({ post, postedBy }) => {
     try {
       e.preventDefault();
       if (!window.confirm("Are you sure you want to delete this post?")) return;
-      const res = await fetch("/api/posts/delete/" + post._id, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        "https://mercial-backend.onrender.com/api/posts/delete/" + post._id,
+        {
+          method: "DELETE",
+        }
+      );
       const data = await res.json();
       if (data.error) {
         return showToast("Error", data.error, "error");

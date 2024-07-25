@@ -108,7 +108,9 @@ const ChatPage = () => {
     const getConversations = async () => {
       startLoader();
       try {
-        const res = await fetch("/api/message/conversations");
+        const res = await fetch(
+          "https://mercial-backend.onrender.com/api/message/conversations"
+        );
         const data = await res.json();
         if (data.error) {
           showToast("Error", data.error, "error");

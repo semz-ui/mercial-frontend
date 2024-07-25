@@ -38,12 +38,15 @@ const Actions = ({ post }) => {
         "error"
       );
     try {
-      const res = await fetch("/api/posts/like/" + post._id, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await fetch(
+        "https://mercial-backend.onrender.com/api/posts/like/" + post._id,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const data = await res.json();
       if (data.error) {
         return showToast("Error", data.error, "error");
@@ -82,13 +85,16 @@ const Actions = ({ post }) => {
         "error"
       );
     try {
-      const res = await fetch("/api/posts/reply/" + post._id, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: reply }),
-      });
+      const res = await fetch(
+        "https://mercial-backend.onrender.com/api/posts/reply/" + post._id,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: reply }),
+        }
+      );
       const data = await res.json();
       if (data.error) {
         return showToast("Error", data.error, "error");

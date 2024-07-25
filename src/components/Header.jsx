@@ -18,7 +18,6 @@ const Header = () => {
   const user = useRecoilValue(userAtom);
   const { colorMode, toggleColorMode } = useColorMode();
   const { pathname } = useLocation();
-  console.log(pathname);
   return (
     <Flex justifyContent={"space-between"} alignItems={"center"} mt={1} mb={12}>
       {user && (
