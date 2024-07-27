@@ -68,6 +68,7 @@ export default function Signup({ toggleScreen }) {
         isClosable: true,
       });
       localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("token", JSON.stringify(data.token));
       setUser(data);
     } catch (error) {
       console.log(error);
