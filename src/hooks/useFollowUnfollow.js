@@ -25,8 +25,6 @@ const useFollowUnfollow = (user) => {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
-        },
-        headers: {
           "Content-Type": "application/json",
         },
       });
