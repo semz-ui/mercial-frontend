@@ -13,22 +13,32 @@ import {
   VStack,
   useToast,
 } from "@chakra-ui/react";
-import { BsInstagram } from "react-icons/bs";
+import { BsChat, BsInstagram } from "react-icons/bs";
 import { CgMoreO } from "react-icons/cg";
 import React, { useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atom/userAtom";
 import { useNavigate } from "react-router-dom";
+import {
+  conversationsAtom,
+  selectedConversationAtom,
+} from "../atom/messagesAtom";
+import useShowToast from "../hooks/useShowToast";
 
 const UserHeader = ({ user }) => {
   const token = JSON.parse(localStorage.getItem("token"));
   const currentUser = useRecoilValue(userAtom);
+  const [selectedConversation, setSelectedConversation] = useRecoilState(
+    selectedConversationAtom
+  );
+  const [conversations, setConversation] = useRecoilState(conversationsAtom);
   const [following, setFollowing] = useState(
     user?.followers?.includes(currentUser?._id)
   );
   const [updating, setUpdating] = useState(false);
   const navigate = useNavigate();
   const toast = useToast();
+  const showToast = useShowToast();
   const copyUrl = () => {
     const currentUrl = window.location.href;
     navigator.clipboard.writeText(currentUrl).then(() => {
@@ -40,6 +50,57 @@ const UserHeader = ({ user }) => {
         isClosable: true,
       });
     });
+  };
+
+  console.log(conversations, "lkå");
+  console.log(selectedConversation, "lk");
+
+  const handleGoToChat = () => {
+    const messagingYourself = user._id === currentUser._id;
+    if (messagingYourself) {
+      showToast("Error", "You cannot message yourself", "error");
+      return;
+    }
+
+    const conversationAlreadyExists = conversations.find(
+      (conversation) => conversation.participants[0]?._id === user?._id
+    );
+
+    if (!conversationAlreadyExists) {
+      const mockConversation = {
+        mock: true,
+        lastMessage: {
+          text: "",
+          sender: "",
+        },
+        _id: Date.now(),
+        participants: [
+          {
+            _id: user._id,
+            username: user.username,
+            profilePic: user.profilePic,
+          },
+        ],
+      };
+      setSelectedConversation({
+        // _id: conversationAlreadyExists._id,
+        userId: user._id,
+        username: user.username,
+        userProfilePic: user.profilePic,
+      });
+      setConversation((prevConvs) => [...prevConvs, mockConversation]);
+      // navigate("/chat");
+    }
+
+    if (conversationAlreadyExists) {
+      setSelectedConversation({
+        _id: conversationAlreadyExists._id,
+        userId: user._id,
+        username: user.username,
+        userProfilePic: user.profilePic,
+      });
+      navigate("/chat");
+    }
   };
   const followUnfollowUser = async () => {
     if (!currentUser) {
@@ -153,15 +214,18 @@ const UserHeader = ({ user }) => {
           Edit Profile
         </Button>
       ) : (
-        <Button
-          size={"sm"}
-          onClick={() => {
-            followUnfollowUser();
-          }}
-          isLoading={updating}
-        >
-          {following ? "Unfollow" : "Follow"}
-        </Button>
+        <Flex alignItems={"center"} gap={5}>
+          <Button
+            size={"sm"}
+            onClick={() => {
+              followUnfollowUser();
+            }}
+            isLoading={updating}
+          >
+            {following ? "Unfollow" : "Follow"}
+          </Button>
+          {/* <BsChat size={20} onClick={handleGoToChat} /> */}
+        </Flex>
       )}
       <Flex w={"full"} justifyContent={"space-between"}>
         <Flex gap={2} alignItems={"center"}>

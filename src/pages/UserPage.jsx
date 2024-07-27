@@ -47,7 +47,7 @@ function UserPage() {
 
   useEffect(() => {
     getUserPost();
-  }, [username, showToast, setPost, getUserPost]);
+  }, [username, showToast, setPost]);
   if (!user && loading && load) {
     return (
       <Flex justifyContent={"center"} alignItems={"center"}>

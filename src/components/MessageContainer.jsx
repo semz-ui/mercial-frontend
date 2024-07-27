@@ -110,7 +110,8 @@ const MessageContainer = () => {
   }, [socket, currentUser._id, messages, selectedConversation]);
 
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messageEndRef.current?.scrollIntoView();
+    // messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   useEffect(() => {

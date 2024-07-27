@@ -138,6 +138,7 @@ const ChatPage = () => {
     };
     getConversations();
   }, [showToast, setConversation]);
+  console.log(selectedConversation, "lk");
   return (
     <Box
       position={"absolute"}
@@ -182,7 +183,7 @@ const ChatPage = () => {
                   onChange={(e) => setSearchText(e.target.value)}
                 />
                 <Button size={"md"}>
-                  <BsSearch />
+                  <BsSearch onClick={handleConSearch} />
                 </Button>
               </Flex>
             </form>
