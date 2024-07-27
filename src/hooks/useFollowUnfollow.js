@@ -4,6 +4,7 @@ import userAtom from "../atom/userAtom";
 import { useRecoilValue } from "recoil";
 
 const useFollowUnfollow = (user) => {
+  const token = JSON.parse(localStorage.getItem("token"));
   const currentUser = useRecoilValue(userAtom);
   const [following, setFollowing] = useState(
     user.followers.includes(currentUser?._id)
@@ -22,6 +23,9 @@ const useFollowUnfollow = (user) => {
     try {
       const res = await fetch(`/api/users/follow/${user._id}`, {
         method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         headers: {
           "Content-Type": "application/json",
         },
