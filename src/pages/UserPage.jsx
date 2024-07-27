@@ -18,36 +18,36 @@ function UserPage() {
   const { username } = useParams();
   const showToast = useShowToast();
   const { loading: load, startLoader, stopLoader } = useLoading();
-  useEffect(() => {
-    const getUserPost = async () => {
-      if (!user) return;
-      startLoader();
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/posts/user/${username}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        if (data.error) {
-          showToast("Error", data.error, "error");
-          return;
+
+  const getUserPost = async () => {
+    if (!user) return;
+    startLoader();
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/posts/user/${username}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-        setPost(data);
-      } catch (error) {
-        showToast("Error", error, "error");
-        setPost([]);
-      } finally {
-        stopLoader();
+      );
+      const data = await response.json();
+      if (data.error) {
+        showToast("Error", data.error, "error");
+        return;
       }
-    };
+      setPost(data);
+    } catch (error) {
+      showToast("Error", error, "error");
+      setPost([]);
+    } finally {
+      stopLoader();
+    }
+  };
 
+  useEffect(() => {
     getUserPost();
-  }, [username, showToast, setPost]);
-
+  }, [username, showToast, setPost, getUserPost]);
   if (!user && loading && load) {
     return (
       <Flex justifyContent={"center"} alignItems={"center"}>
