@@ -19,34 +19,34 @@ function UserPage() {
   const showToast = useShowToast();
   const { loading: load, startLoader, stopLoader } = useLoading();
   useEffect(() => {
+    const getUserPost = async () => {
+      if (!user) return;
+      startLoader();
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/posts/user/${username}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.error) {
+          showToast("Error", data.error, "error");
+          return;
+        }
+        setPost(data);
+      } catch (error) {
+        showToast("Error", error, "error");
+        setPost([]);
+      } finally {
+        stopLoader();
+      }
+    };
+
     getUserPost();
   }, [username, showToast, setPost]);
-
-  const getUserPost = async () => {
-    if (!user) return;
-    startLoader();
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/posts/user/${username}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (data.error) {
-        showToast("Error", data.error, "error");
-        return;
-      }
-      setPost(data);
-    } catch (error) {
-      showToast("Error", error, "error");
-      setPost([]);
-    } finally {
-      stopLoader();
-    }
-  };
 
   if (!user && loading && load) {
     return (
@@ -57,7 +57,6 @@ function UserPage() {
   }
 
   if (!user && !loading) return <h1>User not found</h1>;
-  console.log(loading);
 
   return (
     <>
