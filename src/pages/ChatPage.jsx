@@ -27,6 +27,7 @@ const ChatPage = () => {
     selectedConversationAtom
   );
   const currentUser = useRecoilValue(userAtom);
+  const token = JSON.parse(localStorage.getItem("token"));
   const [searchText, setSearchText] = useState("");
   const { loading, startLoader, stopLoader } = useLoading();
   const showToast = useShowToast();
@@ -55,7 +56,14 @@ const ChatPage = () => {
   const handleConSearch = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`/api/users/profile/${searchText}`);
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/profile/${searchText}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const searchedUser = await res.json();
       if (searchedUser.error) {
@@ -109,7 +117,12 @@ const ChatPage = () => {
       startLoader();
       try {
         const res = await fetch(
-          "https://mercial-backend.onrender.com/api/message/conversations"
+          `${import.meta.env.VITE_API_URL}/api/message/conversations`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const data = await res.json();
         if (data.error) {
@@ -196,7 +209,7 @@ const ChatPage = () => {
                 <Conversation
                   key={conversation._id}
                   isOnline={onlineUsers.includes(
-                    conversation.participants[0]._id
+                    conversation.participants[0]?._id
                   )}
                   conversation={conversation}
                 />

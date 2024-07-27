@@ -37,7 +37,7 @@ export default function Login({ toggleScreen }) {
     startLoader();
     try {
       const response = await fetch(
-        "https://mercial-backend.onrender.com/api/users/login",
+        `${import.meta.env.VITE_API_URL}/api/users/login`,
         {
           method: "POST",
           headers: {
@@ -65,8 +65,9 @@ export default function Login({ toggleScreen }) {
         duration: 3000,
         isClosable: true,
       });
-      localStorage.setItem("user", JSON.stringify(data));
       setUser(data);
+      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("token", JSON.stringify(data.token));
     } catch (error) {
       setError(error);
     } finally {

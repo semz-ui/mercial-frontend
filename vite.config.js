@@ -9,7 +9,7 @@ export default defineConfig({
     // Get rid of the CORS error
     proxy: {
       "/api": {
-        target: "https://mercial-backend.onrender.com",
+        target: "http://localhost:5000",
         changeOrigin: true,
         secure: false,
       },

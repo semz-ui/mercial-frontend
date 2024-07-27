@@ -39,7 +39,7 @@ export default function Signup({ toggleScreen }) {
     startLoader();
     try {
       const response = await fetch(
-        "https://mercial-backend.onrender.com/api/users/signup",
+        `${import.meta.env.VITE_API_URL}/api/users/signup`,
         {
           method: "POST",
           headers: {

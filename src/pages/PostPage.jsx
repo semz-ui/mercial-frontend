@@ -24,6 +24,7 @@ import postAtom from "../atom/postAtom";
 const PostPage = () => {
   const navigate = useNavigate();
   const currentUser = useRecoilValue(userAtom);
+  const token = JSON.parse(localStorage.getItem("token"));
   const { loading, user } = useGetUser();
   const [posts, setPost] = useRecoilState(postAtom);
   const { pId } = useParams();
@@ -35,7 +36,12 @@ const PostPage = () => {
       setPost([]);
       try {
         const response = await fetch(
-          `https://mercial-backend.onrender.com/api/posts/${pId}`
+          `${import.meta.env.VITE_API_URL}/api/posts/${pId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const data = await response.json();
         if (data.error) {
@@ -54,10 +60,13 @@ const PostPage = () => {
       e.preventDefault();
       if (!window.confirm("Are you sure you want to delete this post?")) return;
       const res = await fetch(
-        "https://mercial-backend.onrender.com/api/posts/delete/" +
-          currentPost._id,
+        `${import.meta.env.VITE_API_URL}/api/posts/delete/` + currentPost._id,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
       const data = await res.json();

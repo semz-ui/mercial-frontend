@@ -12,6 +12,7 @@ import postAtom from "../atom/postAtom";
 import useLoading from "../hooks/useLoading";
 
 const Post = ({ post, postedBy }) => {
+  const token = JSON.parse(localStorage.getItem("token"));
   const navigate = useNavigate();
   const { loading, startLoader, stopLoader } = useLoading();
   const showToast = useShowToast();
@@ -22,7 +23,12 @@ const Post = ({ post, postedBy }) => {
     const getUser = async () => {
       try {
         const response = await fetch(
-          `https://mercial-backend.onrender.com/api/users/profile/${postedBy}`
+          `${import.meta.env.VITE_API_URL}/api/users/profile/${postedBy}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const data = await response.json();
         if (data.error) {
@@ -44,9 +50,13 @@ const Post = ({ post, postedBy }) => {
       e.preventDefault();
       if (!window.confirm("Are you sure you want to delete this post?")) return;
       const res = await fetch(
-        "https://mercial-backend.onrender.com/api/posts/delete/" + post._id,
+        `${import.meta.env.VITE_API_URL}/api/posts/delete/` + post._id,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
       const data = await res.json();

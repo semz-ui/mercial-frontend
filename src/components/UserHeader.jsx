@@ -21,6 +21,7 @@ import userAtom from "../atom/userAtom";
 import { useNavigate } from "react-router-dom";
 
 const UserHeader = ({ user }) => {
+  const token = JSON.parse(localStorage.getItem("token"));
   const currentUser = useRecoilValue(userAtom);
   const [following, setFollowing] = useState(
     user?.followers?.includes(currentUser?._id)
@@ -54,13 +55,16 @@ const UserHeader = ({ user }) => {
     if (updating) return;
     setUpdating(true);
     try {
-      const response = await fetch(`/api/users/follow/${user._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId: currentUser?._id }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/follow/${user._id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ userId: currentUser?._id }),
+        }
+      );
       const data = await response.json();
       if (data.error) {
         console.log(data);

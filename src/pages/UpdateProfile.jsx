@@ -27,6 +27,7 @@ export default function UserProfile() {
   const fileRef = useRef(null);
   const user = useRecoilValue(userAtom);
   const setUser = useSetRecoilState(userAtom);
+  const token = JSON.parse(localStorage.getItem("token"));
   const [inputs, setInputs] = useState({
     name: user?.name,
     username: user?.username,
@@ -43,10 +44,11 @@ export default function UserProfile() {
     setUpdating(true);
     try {
       const response = await fetch(
-        `https://mercial-backend.onrender.com/api/users/update/${user._id}`,
+        `${import.meta.env.VITE_API_URL}/api/users/update/${user._id}`,
         {
           method: "PUT",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ ...inputs, profilePic: imgUrl }),

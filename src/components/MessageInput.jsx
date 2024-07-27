@@ -23,12 +23,15 @@ import {
 } from "../atom/messagesAtom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import useLoading from "../hooks/useLoading";
+import userAtom from "../atom/userAtom";
 
 const MessageInput = ({ setMessages }) => {
+  const token = JSON.parse(localStorage.getItem("token"));
   const { handleImageChange, imgUrl, setImgUrl } = usePreviewImage();
   const { loading, startLoader, stopLoader } = useLoading();
   const { onClose } = useDisclosure();
   const selectedConversation = useRecoilValue(selectedConversationAtom);
+  const user = useRecoilValue(userAtom);
   const [conversation, setConversation] = useRecoilState(conversationsAtom);
   const imageRef = useRef(null);
   const [isSending, setIsSending] = useState(false);
@@ -40,20 +43,18 @@ const MessageInput = ({ setMessages }) => {
     if (!messageText && !imgUrl) return;
     if (loading) return;
     try {
-      const res = await fetch(
-        "https://mercial-backend.onrender.com/api/message",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message: messageText,
-            recipientId: selectedConversation.userId,
-            img: imgUrl,
-          }),
-        }
-      );
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/message`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: messageText,
+          recipientId: selectedConversation.userId,
+          img: imgUrl,
+        }),
+      });
       const data = await res.json();
       if (data.error) {
         showToast("Error", data.error, "error");

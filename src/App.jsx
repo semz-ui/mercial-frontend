@@ -11,11 +11,11 @@ import UpdateProfile from "./pages/UpdateProfile";
 import CreatePost from "./components/CreatePost";
 import ChatPage from "./pages/ChatPage";
 import userAtom from "./atom/userAtom";
+import Logout from "./components/Logout";
 
 export default function App() {
   const user = useRecoilValue(userAtom);
   const { pathname } = useLocation();
-  console.log(pathname);
   return (
     <Box position={"relative"} w="full">
       <Container

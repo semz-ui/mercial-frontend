@@ -1,13 +1,15 @@
 import { Button, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import React from "react";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import userAtom from "../atom/userAtom";
 import useShowToast from "../hooks/useShowToast";
 import { MdLogout } from "react-icons/md";
 import useLoading from "../hooks/useLoading";
 
 const Logout = () => {
+  const token = JSON.parse(localStorage.getItem("token"));
+  const user = useRecoilValue(userAtom);
   const navigate = useNavigate();
   const setUser = useSetRecoilState(userAtom);
   const showToast = useShowToast();
@@ -16,10 +18,11 @@ const Logout = () => {
     startLoader();
     try {
       const res = await fetch(
-        "https://mercial-backend.onrender.com/api/users/logout",
+        `${import.meta.env.VITE_API_URL}/api/users/logout`,
         {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -30,6 +33,7 @@ const Logout = () => {
         return;
       }
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
       setUser(null);
       navigate("/auth");
     } catch (error) {

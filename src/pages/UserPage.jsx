@@ -6,12 +6,15 @@ import useShowToast from "../hooks/useShowToast";
 import useLoading from "../hooks/useLoading";
 import Post from "../components/Post";
 import useGetUser from "../hooks/useGetUser";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import postAtom from "../atom/postAtom";
+import userAtom from "../atom/userAtom";
 
 function UserPage() {
   const { loading, user } = useGetUser();
   const [posts, setPost] = useRecoilState(postAtom);
+  const token = JSON.parse(localStorage.getItem("token"));
+
   const { username } = useParams();
   const showToast = useShowToast();
   const { loading: load, startLoader, stopLoader } = useLoading();
@@ -24,7 +27,12 @@ function UserPage() {
     startLoader();
     try {
       const response = await fetch(
-        `https://mercial-backend.onrender.com/api/posts/user/${username}`
+        `${import.meta.env.VITE_API_URL}/api/posts/user/${username}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const data = await response.json();
       if (data.error) {

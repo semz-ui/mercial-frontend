@@ -32,6 +32,7 @@ const MAX_CHAR = 500;
 const CreatePost = () => {
   const { username } = useParams();
   const user = useRecoilValue(userAtom);
+  const token = JSON.parse(localStorage.getItem("token"));
   const [updating, setUpdating] = useState(false);
   const [remainingChar, setRemainingChar] = useState(MAX_CHAR);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -63,10 +64,11 @@ const CreatePost = () => {
     setUpdating(true);
     try {
       const res = await fetch(
-        "https://mercial-backend.onrender.com/api/posts/create",
+        `${import.meta.env.VITE_API_URL}/api/posts/create`,
         {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

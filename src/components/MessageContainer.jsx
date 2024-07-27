@@ -26,6 +26,7 @@ import { useSocket } from "../context/SocketContext";
 import { FaAngleLeft } from "react-icons/fa";
 
 const MessageContainer = () => {
+  const token = JSON.parse(localStorage.getItem("token"));
   const [messages, setMessages] = useState([]);
   const [selectedConversation, setSelectedConversation] = useRecoilState(
     selectedConversationAtom
@@ -118,7 +119,16 @@ const MessageContainer = () => {
       setMessages([]);
       try {
         if (selectedConversation.mock) return;
-        const res = await fetch(`/api/message/${selectedConversation.userId}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/message/${
+            selectedConversation.userId
+          }`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         const data = await res.json();
         if (data.error) {
           showToast("Error", data.error, "error");

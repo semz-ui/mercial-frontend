@@ -10,6 +10,7 @@ import SuggestedUsers from "../components/SuggestedUsers";
 
 const HomePage = () => {
   const [posts, setPosts] = useRecoilState(postAtom);
+  const token = JSON.parse(localStorage.getItem("token"));
   const { loading, startLoader, stopLoader } = useLoading();
   const showToast = useShowToast();
   useEffect(() => {
@@ -18,7 +19,12 @@ const HomePage = () => {
       setPosts([]);
       try {
         const res = await fetch(
-          "https://mercial-backend.onrender.com/api/posts/feed"
+          `${import.meta.env.VITE_API_URL}/api/posts/feed`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const data = await res.json();
         if (data.error) {

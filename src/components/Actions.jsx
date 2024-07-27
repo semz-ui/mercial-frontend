@@ -22,6 +22,7 @@ import postAtom from "../atom/postAtom";
 const Actions = ({ post }) => {
   const user = useRecoilValue(userAtom);
   const [posts, setPost] = useRecoilState(postAtom);
+  const token = JSON.parse(localStorage.getItem("token"));
   const [liked, setLiked] = useState(post?.likes?.includes(user?._id));
   const [isLiking, setIsLiking] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
@@ -39,10 +40,11 @@ const Actions = ({ post }) => {
       );
     try {
       const res = await fetch(
-        "https://mercial-backend.onrender.com/api/posts/like/" + post._id,
+        `${import.meta.env.VITE_API_URL}/api/posts/like/` + post._id,
         {
           method: "PUT",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -86,10 +88,11 @@ const Actions = ({ post }) => {
       );
     try {
       const res = await fetch(
-        "https://mercial-backend.onrender.com/api/posts/reply/" + post._id,
+        `${import.meta.env.VITE_API_URL}/api/posts/reply/` + post._id,
         {
           method: "PUT",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ text: reply }),

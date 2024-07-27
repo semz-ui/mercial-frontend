@@ -4,6 +4,7 @@ import useLoading from "./useLoading";
 import { useParams } from "react-router-dom";
 
 const useGetUser = () => {
+  const token = JSON.parse(localStorage.getItem("token"));
   const [user, setUser] = useState(null);
 
   const showToast = useShowToast();
@@ -13,7 +14,11 @@ const useGetUser = () => {
     const getUser = async () => {
       startLoader();
       try {
-        const response = await fetch(`/api/users/profile/${username}`);
+        const response = await fetch(`/api/users/profile/${username}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await response.json();
         if (data.error) {
           showToast("Error", data.error, "error");

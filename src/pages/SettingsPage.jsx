@@ -3,8 +3,8 @@ import useShowToast from "../hooks/useShowToast";
 import useLogout from "../hooks/useLogout";
 
 export const SettingsPage = () => {
+  const token = JSON.parse(localStorage.getItem("token"));
   const showToast = useShowToast();
-  const logout = useLogout();
 
   const freezeAccount = async () => {
     if (!window.confirm("Are you sure you want to freeze your account?"))
@@ -12,10 +12,13 @@ export const SettingsPage = () => {
 
     try {
       const res = await fetch(
-        "https://mercial-backend.onrender.com/api/users/freeze",
+        `${import.meta.env.VITE_API_URL}/api/users/freeze`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
       const data = await res.json();

@@ -2,18 +2,26 @@ import { Box, Flex, Skeleton, SkeletonCircle, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import SuggestedUser from "./SuggestedUser";
 import useShowToast from "../hooks/useShowToast";
+import { useRecoilState } from "recoil";
+import userAtom from "../atom/userAtom";
 
 const SuggestedUsers = () => {
+  const token = JSON.parse(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
+  const user = useRecoilState(userAtom);
   const [suggestedUsers, setSuggestedUsers] = useState([]);
   const showToast = useShowToast();
-
   useEffect(() => {
     const getSuggestedUsers = async () => {
       setLoading(true);
       try {
         const res = await fetch(
-          "https://mercial-backend.onrender.com/api/users/suggested"
+          `${import.meta.env.VITE_API_URL}/api/users/suggested`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const data = await res.json();
         if (data.error) {
@@ -38,7 +46,7 @@ const SuggestedUsers = () => {
       </Text>
       <Flex direction={"column"} gap={4}>
         {!loading &&
-          suggestedUsers?.map((user) => (
+          suggestedUsers.map((user) => (
             <SuggestedUser key={user._id} user={user} />
           ))}
         {loading &&
