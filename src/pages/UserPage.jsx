@@ -66,7 +66,12 @@ function UserPage() {
       )}
       {posts !== 0 &&
         posts.map((post) => (
-          <Post post={post} postedBy={post?.postedBy} key={post._id} />
+          <Post
+            post={post}
+            postedBy={post?.postedBy}
+            key={post._id}
+            loading={load}
+          />
         ))}
     </>
   );

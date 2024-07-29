@@ -27,6 +27,7 @@ import useShowToast from "../hooks/useShowToast";
 
 const UserHeader = ({ user }) => {
   const token = JSON.parse(localStorage.getItem("token"));
+  const [nav, setNav] = useState("Threads");
   const currentUser = useRecoilValue(userAtom);
   const [selectedConversation, setSelectedConversation] = useRecoilState(
     selectedConversationAtom
@@ -52,8 +53,10 @@ const UserHeader = ({ user }) => {
     });
   };
 
-  console.log(conversations, "lkå");
-  console.log(selectedConversation, "lk");
+  const handleNav = (data) => {
+    if (nav === data) return;
+    setNav(data);
+  };
 
   const handleGoToChat = () => {
     const messagingYourself = user._id === currentUser._id;
@@ -253,24 +256,36 @@ const UserHeader = ({ user }) => {
           </Box>
         </Flex>
       </Flex>
-      <Flex w={"full"}>
+      <Flex w={"full"} gap={2}>
         <Flex
           flex={1}
-          borderBottom={"1.5px solid white"}
+          borderBottom={`1.5px solid ${nav === "Threads" ? "white" : "gray"}`}
           justifyContent={"center"}
           pb={3}
           cursor={"pointer"}
+          onClick={() => handleNav("Threads")}
         >
           <Text fontWeight={"bold"}>Threads</Text>
         </Flex>
         <Flex
           flex={1}
-          borderBottom={"1px solid gray"}
+          borderBottom={`1px solid ${nav === "Replies" ? "white" : "gray"}`}
           justifyContent={"center"}
           pb={3}
           cursor={"pointer"}
+          onClick={() => handleNav("Replies")}
         >
           <Text fontWeight={"bold"}>Replies</Text>
+        </Flex>
+        <Flex
+          flex={1}
+          borderBottom={`1px solid ${nav === "Likes" ? "white" : "gray"}`}
+          justifyContent={"center"}
+          pb={3}
+          cursor={"pointer"}
+          onClick={() => handleNav("Likes")}
+        >
+          <Text fontWeight={"bold"}>Likes</Text>
         </Flex>
       </Flex>
     </VStack>

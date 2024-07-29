@@ -1,11 +1,15 @@
 import {
+  Avatar,
   Box,
   Button,
   Flex,
+  Image,
   Input,
   Skeleton,
   SkeletonCircle,
+  Stack,
   Text,
+  useColorMode,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { BsFillChatHeartFill, BsSearch } from "react-icons/bs";
@@ -22,6 +26,7 @@ import userAtom from "../atom/userAtom";
 import { useSocket } from "../context/SocketContext";
 
 const ChatPage = () => {
+  const { colorMode } = useColorMode();
   const [conversations, setConversation] = useRecoilState(conversationsAtom);
   const [selectedConversation, setSelectedConversation] = useRecoilState(
     selectedConversationAtom
@@ -29,6 +34,8 @@ const ChatPage = () => {
   const currentUser = useRecoilValue(userAtom);
   const token = JSON.parse(localStorage.getItem("token"));
   const [searchText, setSearchText] = useState("");
+  const [searchedUser, setSearchedUser] = useState([]);
+  const [load, setLoad] = useState(false);
   const { loading, startLoader, stopLoader } = useLoading();
   const showToast = useShowToast();
   const { socket, onlineUsers } = useSocket();
@@ -53,11 +60,30 @@ const ChatPage = () => {
     });
   }, [socket, setConversation]);
 
-  const handleConSearch = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    socket?.on("updateConversation", (data) => {
+      setConversation((prevConvs) => {
+        const updatedConversations = prevConvs.map((conversation) => {
+          if (conversation._id === data._id) {
+            return {
+              ...conversation,
+              lastMessage: data.lastMessage,
+              updatedAt: data.updatedAt,
+            };
+          }
+          return conversation;
+        });
+        return updatedConversations;
+      });
+    });
+    return () => socket?.off("updateConversation");
+  }, [socket, conversations, setConversation]);
+
+  const handleConSearch = async (username, e) => {
+    e?.preventDefault();
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/users/profile/${searchText}`,
+        `${import.meta.env.VITE_API_URL}/api/users/profile/${username}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -109,6 +135,9 @@ const ChatPage = () => {
       setConversation((prevConvs) => [...prevConvs, mockConversation]);
     } catch (error) {
       showToast("Error", "It's us, not you", "error");
+    } finally {
+      setSearchedUser([]);
+      setSearchText("");
     }
   };
 
@@ -138,7 +167,44 @@ const ChatPage = () => {
     };
     getConversations();
   }, [showToast, setConversation]);
-  console.log(selectedConversation, "lk");
+  const onChangeSearch = async (e) => {
+    setLoad(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/search/${searchText}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const searchUser = await res.json();
+      if (searchUser.error) {
+        showToast("Error", searchUser.error, "error");
+        return;
+      }
+      setSearchedUser(searchUser);
+      const messagingYourself = searchUser._id === currentUser._id;
+      if (messagingYourself) {
+        showToast("Error", "You cannot message yourself", "error");
+        return;
+      }
+    } catch {
+      showToast("Error", "It's us not you", "error");
+    } finally {
+      setLoad(false);
+    }
+  };
+  useEffect(() => {
+    if (searchText.length > 0) {
+      onChangeSearch();
+    }
+    if (searchText.length == 0) {
+      setSearchedUser([]);
+    }
+  }, [searchText]);
+  console.log(searchText.length);
+  console.log(searchedUser);
   return (
     <Box
       position={"absolute"}
@@ -183,9 +249,57 @@ const ChatPage = () => {
                   onChange={(e) => setSearchText(e.target.value)}
                 />
                 <Button size={"md"}>
-                  <BsSearch onClick={handleConSearch} />
+                  <BsSearch />
                 </Button>
               </Flex>
+              {searchText.length > 0 && (
+                <Stack
+                  p={4}
+                  position={"absolute"}
+                  zIndex={1}
+                  w={250}
+                  mt={2}
+                  bg={colorMode === "light" ? "gray.200" : "gray.700"}
+                  borderRadius={5}
+                >
+                  {load &&
+                    [0, 1, 2].map((_, i) => (
+                      <Flex
+                        key={i}
+                        gap={4}
+                        alignItems={"center"}
+                        p={"1"}
+                        borderRadius={"md"}
+                      >
+                        <Box>
+                          <SkeletonCircle size={"10"} />
+                        </Box>
+                        <Flex w={"full"} flexDirection={"column"} gap={3}>
+                          <Skeleton h={"10px"} w={"80px"} />
+                        </Flex>
+                      </Flex>
+                    ))}
+                  {searchedUser?.map((user) => (
+                    <Flex
+                      zIndex={1}
+                      key={user._id}
+                      alignItems={"center"}
+                      gap={2}
+                      cursor={"pointer"}
+                      mt={3}
+                      onClick={() => handleConSearch(user.username)}
+                    >
+                      <Avatar
+                        src={user.profilePic}
+                        name={user.username}
+                        w={10}
+                        h={10}
+                      />
+                      <Text>{user.username}</Text>
+                    </Flex>
+                  ))}
+                </Stack>
+              )}
             </form>
             {loading &&
               [0, 1, 2, 3, 4].map((_, i) => (

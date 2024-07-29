@@ -11,7 +11,7 @@ import userAtom from "../atom/userAtom";
 import postAtom from "../atom/postAtom";
 import useLoading from "../hooks/useLoading";
 
-const Post = ({ post, postedBy }) => {
+const Post = ({ post, postedBy, load }) => {
   const token = JSON.parse(localStorage.getItem("token"));
   const navigate = useNavigate();
   const { loading, startLoader, stopLoader } = useLoading();
@@ -19,31 +19,32 @@ const Post = ({ post, postedBy }) => {
   const [user, setUser] = useState(null);
   const [posts, setPost] = useRecoilState(postAtom);
   const currentUser = useRecoilValue(userAtom);
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/users/profile/${postedBy}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        if (data.error) {
-          showToast("Error", data.error, "error");
-          return;
+
+  const getUser = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/profile/${postedBy}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-        // setLiked(data.liked);
-        setUser(data);
-      } catch (error) {
-        showToast("Error", error, "error");
-        setUser(null);
+      );
+      const data = await response.json();
+      if (data.error) {
+        showToast("Error", data.error, "error");
+        return;
       }
-    };
+      // setLiked(data.liked);
+      setUser(data);
+    } catch (error) {
+      showToast("Error", error, "error");
+      setUser(null);
+    }
+  };
+  useEffect(() => {
     getUser();
-  }, []);
+  }, [setUser, showToast]);
   const handleDelete = async (e) => {
     startLoader();
     try {
@@ -71,6 +72,12 @@ const Post = ({ post, postedBy }) => {
       stopLoader();
     }
   };
+
+  if (load) {
+    return <Spinner />;
+  }
+
+  console.log(load);
   return (
     <Link to={`/${user?.username}/post/${post._id}`}>
       <Flex gap={3} mb={4} py={5}>

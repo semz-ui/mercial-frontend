@@ -89,6 +89,22 @@ const MessageContainer = () => {
         conversationId: selectedConversation._id,
         userId: selectedConversation.userId,
       });
+      setConversation((prev) => {
+        const updatedConversations = prev.map((conversation) => {
+          if (selectedConversation._id) {
+            return {
+              ...conversation,
+              lastMessage: {
+                ...conversation.lastMessage,
+                ...conversation.seen,
+                notSeenLength: 0,
+              },
+            };
+          }
+          return conversation;
+        });
+        return updatedConversations;
+      });
     }
 
     socket.on("messagesSeen", ({ conversationId }) => {
@@ -113,7 +129,6 @@ const MessageContainer = () => {
     messageEndRef.current?.scrollIntoView();
     // messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
   useEffect(() => {
     const getMessages = async () => {
       startLoader();
@@ -122,7 +137,7 @@ const MessageContainer = () => {
         if (selectedConversation.mock) return;
         const res = await fetch(
           `${import.meta.env.VITE_API_URL}/api/message/${
-            selectedConversation.userId
+            selectedConversation._id
           }`,
           {
             headers: {

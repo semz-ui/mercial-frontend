@@ -52,6 +52,7 @@ const MessageInput = ({ setMessages }) => {
         body: JSON.stringify({
           message: messageText,
           recipientId: selectedConversation.userId,
+          conversationId: selectedConversation._id,
           img: imgUrl,
         }),
       });
