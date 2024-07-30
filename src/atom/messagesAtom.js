@@ -11,6 +11,7 @@ export const selectedConversationAtom = atom({
     _id: "",
     userId: "",
     username: "",
+    isGroup: false,
     userProfilePic: "",
   },
 });

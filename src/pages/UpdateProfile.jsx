@@ -91,6 +91,7 @@ export default function UserProfile() {
       password: "",
     });
     setImgUrl(null);
+    navigate(`/${inputs?.username}`);
   };
 
   const { handleImageChange, imgUrl, setImgUrl } = usePreviewImage();

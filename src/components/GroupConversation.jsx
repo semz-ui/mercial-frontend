@@ -46,7 +46,8 @@ const GroupConversation = ({ conversation, isOnline }) => {
         setSelectedConversation({
           _id: conversation._id,
           userProfilePic: user.profilePic,
-          username: user.username,
+          username: user.groupName,
+          isGroup: conversation.isGroup,
           mock: conversation.mock,
         })
       }
@@ -70,7 +71,7 @@ const GroupConversation = ({ conversation, isOnline }) => {
         />
       </WrapItem>
 
-      <Stack direction={"column"} fontSize={"sm"}>
+      <Stack direction={"column"} fontSize={"sm"} w={"full"}>
         <Text fontWeight="700" display={"flex"} alignItems={"center"}>
           {group?.groupName}
         </Text>
@@ -82,8 +83,8 @@ const GroupConversation = ({ conversation, isOnline }) => {
           ) : (
             ""
           )}
-          {lastMessage?.text?.length > 10
-            ? lastMessage.text.substring(0, 10) + "..."
+          {lastMessage?.text?.length > 18
+            ? lastMessage.text.substring(0, 18) + "..."
             : lastMessage.text || <BsFillImageFill size={16} />}
         </Text>
       </Stack>

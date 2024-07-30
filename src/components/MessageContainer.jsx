@@ -31,7 +31,8 @@ const MessageContainer = () => {
   const [selectedConversation, setSelectedConversation] = useRecoilState(
     selectedConversationAtom
   );
-
+  const [previousMessages, setPreviousMessages] = useState([]);
+  const [extractedMessages, setExtractedMessages] = useState([]);
   const setConversation = useSetRecoilState(conversationsAtom);
   const currentUser = useRecoilValue(userAtom);
   const messageEndRef = useRef(null);
@@ -160,6 +161,54 @@ const MessageContainer = () => {
 
     getMessages();
   }, [showToast, selectedConversation.userId, selectedConversation.mock]);
+
+  useEffect(() => {
+    const getPreviousMessages = (messages) => {
+      const result = [];
+      let previousMessages = [];
+
+      messages.forEach((message) => {
+        if (
+          previousMessages.length > 0 &&
+          previousMessages[previousMessages.length - 1].sender !==
+            message.sender
+        ) {
+          result.push(previousMessages[previousMessages.length - 1]);
+        }
+        previousMessages.push(message);
+      });
+
+      return result;
+    };
+
+    const calculatedPreviousMessages = getPreviousMessages(messages);
+    setPreviousMessages(calculatedPreviousMessages);
+  }, [messages]);
+  // get first messages
+  useEffect(() => {
+    const result = [];
+    let firstMessages = [];
+  }, []);
+
+  useEffect(() => {
+    const extractMessagesOnIdChange = (messages) => {
+      const result = [];
+      let previousUserId = null;
+
+      messages.forEach((message) => {
+        if (previousUserId !== message.sender) {
+          result.push(message);
+        }
+        previousUserId = message.sender;
+      });
+
+      return result;
+    };
+
+    const calculatedExtractedMessages = extractMessagesOnIdChange(messages);
+    setExtractedMessages(calculatedExtractedMessages);
+  }, [messages]);
+  const lastMessage = messages[messages.length - 1];
   return (
     <Flex
       flex="70"
@@ -169,18 +218,15 @@ const MessageContainer = () => {
       flexDirection={"column"}
     >
       {/* Message header */}
-      <Flex w={"full"} h={12} alignItems={"center"}>
+      <Flex w={"full"} h={12} alignItems={"center"} gap={5}>
         <FaAngleLeft cursor={"pointer"} onClick={goBack} />
-        <Flex
-          alignItems={"center"}
-          gap={2}
-          w={"full"}
-          justifyContent={"center"}
-        >
+        <Flex alignItems={"center"} gap={2} justifyContent={"center"}>
           <Avatar src={selectedConversation?.userProfilePic} size={"sm"} />
           <Text display={"flex"} alignItems={"center"}>
             {selectedConversation?.username}
-            <Image src="/verified.png" w={4} h={4} ml={1} />
+            {!selectedConversation?.isGroup && (
+              <Image src="/verified.png" w={4} h={4} ml={1} />
+            )}
           </Text>
         </Flex>
       </Flex>
@@ -230,6 +276,9 @@ const MessageContainer = () => {
               <Message
                 message={message}
                 ownMessage={currentUser._id === message.sender}
+                previousMessages={previousMessages}
+                lastmessage={lastMessage}
+                extractedMessages={extractedMessages}
               />
             </Flex>
           ))}

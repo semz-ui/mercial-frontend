@@ -5,6 +5,11 @@ import {
   Flex,
   Image,
   Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
   Skeleton,
   SkeletonCircle,
   Stack,
@@ -24,6 +29,7 @@ import {
 import useShowToast from "../hooks/useShowToast";
 import userAtom from "../atom/userAtom";
 import { useSocket } from "../context/SocketContext";
+import { CgMoreO } from "react-icons/cg";
 
 const ChatPage = () => {
   const { colorMode } = useColorMode();
@@ -203,8 +209,6 @@ const ChatPage = () => {
       setSearchedUser([]);
     }
   }, [searchText]);
-  console.log(searchText.length);
-  console.log(searchedUser);
   return (
     <Box
       position={"absolute"}
@@ -231,7 +235,7 @@ const ChatPage = () => {
       >
         {!selectedConversation._id && (
           <Flex
-            flex={30}
+            flex={40}
             gap={2}
             flexDirection={"column"}
             maxW={{
@@ -240,7 +244,21 @@ const ChatPage = () => {
             }}
             mx={"auto"}
           >
-            <Text fontWeight={700}>Your Conversations</Text>
+            <Flex alignItems={"center"} justifyContent={"space-between"}>
+              <Text fontWeight={700}>Your Conversations</Text>
+              <Box className="icon-container">
+                <Menu>
+                  <MenuButton>
+                    <CgMoreO size={24} cursor={"pointer"} />
+                  </MenuButton>
+                  <Portal>
+                    <MenuList bg={"gray.dark"}>
+                      <MenuItem bg={"gray.dark"}>Create Group</MenuItem>
+                    </MenuList>
+                  </Portal>
+                </Menu>
+              </Box>
+            </Flex>
             <form onSubmit={handleConSearch}>
               <Flex alignItems={"center"} gap={1}>
                 <Input

@@ -12,6 +12,7 @@ import CreatePost from "./components/CreatePost";
 import ChatPage from "./pages/ChatPage";
 import userAtom from "./atom/userAtom";
 import Logout from "./components/Logout";
+import CreateGroup from "./components/CreateGroup";
 
 export default function App() {
   const user = useRecoilValue(userAtom);
@@ -37,7 +38,14 @@ export default function App() {
           />
           <Route path="/:username" element={<UserPage />} />
           <Route path="/:username/post/:pId" element={<PostPage />} />
-          <Route path="/chat" element={<ChatPage />} />
+          <Route
+            path="/chat"
+            element={user ? <ChatPage /> : <Navigate to="/auth" />}
+          />
+          <Route
+            path="/chat/create-group"
+            element={user ? <CreateGroup /> : <Navigate to="/auth" />}
+          />
         </Routes>
         {pathname !== "/chat" && user && <CreatePost />}
       </Container>

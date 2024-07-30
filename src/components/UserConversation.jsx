@@ -58,6 +58,7 @@ const UserConversation = ({ conversation, isOnline }) => {
           : ""
       }
       borderRadius={"md"}
+      w={"full"}
     >
       <WrapItem>
         <Avatar
@@ -72,7 +73,7 @@ const UserConversation = ({ conversation, isOnline }) => {
         </Avatar>
       </WrapItem>
 
-      <Stack direction={"column"} fontSize={"sm"}>
+      <Stack direction={"column"} fontSize={"sm"} w={"full"}>
         <Text fontWeight="700" display={"flex"} alignItems={"center"}>
           {user?.username}
           <Image src="/verified.png" w={4} h={4} ml={1} />
@@ -85,8 +86,8 @@ const UserConversation = ({ conversation, isOnline }) => {
           ) : (
             ""
           )}
-          {lastMessage?.text?.length > 10
-            ? lastMessage.text.substring(0, 10) + "..."
+          {lastMessage?.text?.length > 18
+            ? lastMessage.text.substring(0, 18) + "..."
             : lastMessage.text || <BsFillImageFill size={16} />}
         </Text>
       </Stack>

@@ -42,20 +42,43 @@ const MessageInput = ({ setMessages }) => {
     e.preventDefault();
     if (!messageText && !imgUrl) return;
     if (loading) return;
+    const isGroup = selectedConversation.isGroup;
+    console.log(isGroup);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/message`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: messageText,
-          recipientId: selectedConversation.userId,
-          conversationId: selectedConversation._id,
-          img: imgUrl,
-        }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/message`,
+        isGroup
+          ? {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                message: messageText,
+                recipientId: selectedConversation.userId,
+                conversationId: selectedConversation._id,
+                img: imgUrl,
+                senderData: {
+                  username: user.username,
+                  profilePic: user.profilePic,
+                },
+              }),
+            }
+          : {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                message: messageText,
+                recipientId: selectedConversation.userId,
+                conversationId: selectedConversation._id,
+                img: imgUrl,
+              }),
+            }
+      );
       const data = await res.json();
       if (data.error) {
         showToast("Error", data.error, "error");
