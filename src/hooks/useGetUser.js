@@ -15,7 +15,7 @@ const useGetUser = () => {
     startLoader();
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/users/profile/${"test"}`,
+        `${import.meta.env.VITE_API_URL}/api/users/profile/${username}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
