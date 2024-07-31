@@ -19,7 +19,7 @@ const VideoCallPage = () => {
   const peerInstance = useRef(null);
 
   useEffect(() => {
-    const peer = new Peer(currentUser._id + 23);
+    const peer = new Peer();
     peer.on("open", (id) => {
       setPeerId(id);
     });
