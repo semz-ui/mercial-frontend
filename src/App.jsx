@@ -13,6 +13,7 @@ import ChatPage from "./pages/ChatPage";
 import userAtom from "./atom/userAtom";
 import Logout from "./components/Logout";
 import CreateGroup from "./components/CreateGroup";
+import VideoCallPage from "./pages/VideoCallPage";
 
 export default function App() {
   const user = useRecoilValue(userAtom);
@@ -45,6 +46,10 @@ export default function App() {
           <Route
             path="/chat/create-group"
             element={user ? <CreateGroup /> : <Navigate to="/auth" />}
+          />
+          <Route
+            path="/video-call"
+            element={user ? <VideoCallPage /> : <Navigate to="/auth" />}
           />
         </Routes>
         {pathname !== "/chat" && user && <CreatePost />}
