@@ -149,7 +149,7 @@ const VideoCallPage = () => {
       />
       <button onClick={() => callUser(remotePeerIdValue)}>Call</button>
       <div>
-        <video ref={currentUserVideoRef} />
+        <video ref={currentUserVideoRef} playsInline autoPlay />
 
         <Stack cursor={"pointer"} onClick={() => toggleAudio()}>
           <p>toggle audio</p>
@@ -168,7 +168,7 @@ const VideoCallPage = () => {
           //   visibility: "hidden",
         }}
       >
-        <video ref={remoteVideoRef} />
+        <video ref={remoteVideoRef} playsInline autoPlay />
         user video
       </div>
       {incomingCall ? (

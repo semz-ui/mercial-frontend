@@ -13,6 +13,7 @@ export const selectedConversationAtom = atom({
     username: "",
     isGroup: false,
     userProfilePic: "",
+    peerId: "",
   },
 });
 

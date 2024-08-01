@@ -22,6 +22,7 @@ import Conversation from "../components/Conversation";
 import MessageContainer from "../components/MessageContainer";
 import useLoading from "../hooks/useLoading";
 import { useRecoilState, useRecoilValue } from "recoil";
+import messageSound from "../assets/sounds/message.mp3";
 import {
   conversationsAtom,
   selectedConversationAtom,
@@ -68,6 +69,10 @@ const ChatPage = () => {
 
   useEffect(() => {
     socket?.on("updateConversation", (data) => {
+      if (!document.hasFocus()) {
+        const sound = new Audio(messageSound);
+        sound.play();
+      }
       setConversation((prevConvs) => {
         const updatedConversations = prevConvs.map((conversation) => {
           if (conversation._id === data._id) {

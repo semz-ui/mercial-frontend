@@ -37,13 +37,13 @@ const MessageInput = ({ setMessages }) => {
   const [isSending, setIsSending] = useState(false);
   const [messageText, setMessageText] = useState("");
   const showToast = useShowToast();
+  console.log(selectedConversation._id);
   const handleSendMessage = async (e) => {
     startLoader();
     e.preventDefault();
     if (!messageText && !imgUrl) return;
     if (loading) return;
     const isGroup = selectedConversation.isGroup;
-    console.log(isGroup);
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/api/message`,
