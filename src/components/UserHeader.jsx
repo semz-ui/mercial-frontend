@@ -290,7 +290,6 @@ const UserHeader = ({ user }) => {
           <Text fontWeight={"bold"}>Likes</Text>
         </Flex>
       </Flex>
-      <p onClick={() => navigate("/video-call")}>Video</p>
     </VStack>
   );
 };
