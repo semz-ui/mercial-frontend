@@ -1,96 +1,61 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSocket } from "../context/SocketContext";
-import { useRecoilValue } from "recoil";
 import Peer from "simple-peer";
-import userAtom from "../atom/userAtom";
-
-const VideoCallPage2 = () => {
-  const currentUser = useRecoilValue(userAtom);
-  const [yourID, setYourID] = useState("");
-  const [users, setUsers] = useState({});
+import { io } from "socket.io-client";
+// replace your server endpoint here
+const socket = io("http://localhost:5000");
+function VideoCall() {
+  const [me, setMe] = useState("");
   const [stream, setStream] = useState();
   const [receivingCall, setReceivingCall] = useState(false);
   const [caller, setCaller] = useState("");
   const [callerSignal, setCallerSignal] = useState();
   const [callAccepted, setCallAccepted] = useState(false);
-
+  const [idToCall, setIdToCall] = useState("");
+  const [callEnded, setCallEnded] = useState(false);
+  const [name, setName] = useState("");
   const userVideo = useRef();
-  const partnerVideo = useRef();
-
-  const { socket } = useSocket();
-
+  const connectionRef = useRef();
+  const myVideo = useRef();
   useEffect(() => {
-    socket?.on("yourID", (id) => {
-      setYourID(id);
+    socket.on("me", (id) => {
+      setMe(id);
     });
-    socket?.on("allUsers", (users) => {
-      setUsers(users);
-    });
-
-    socket?.on("hey", (data) => {
+    socket.on("callUser", (data) => {
       setReceivingCall(true);
       setCaller(data.from);
+      setName(data.name);
       setCallerSignal(data.signal);
     });
-  }, [stream]);
-  console.lo9stream, "stream";
-
-  function callPeer(id) {
-    // var getUserMedia =
-    //   navigator.getUserMedia ||
-    //   navigator.webkitGetUserMedia ||
-    //   navigator.mozGetUserMedia;
-
+  }, [myVideo]);
+  console.log(stream);
+  const callUser = (id) => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
-        setStream(stream);
-        userVideo.current.srcObject = stream;
-      });
-
-    if (userVideo.current.srcObject) {
-      const peer = new Peer({
-        initiator: true,
-        trickle: false,
-        config: {
-          iceServers: [
-            {
-              urls: "stun:numb.viagenie.ca",
-              username: "sultan1640@gmail.com",
-              credential: "98376683",
-            },
-            {
-              urls: "turn:numb.viagenie.ca",
-              username: "sultan1640@gmail.com",
-              credential: "98376683",
-            },
-          ],
-        },
-        stream: userVideo.current.srcObject,
-      });
-
-      peer.on("signal", (data) => {
-        socket.current.emit("callUser", {
-          userToCall: id,
-          signalData: data,
-          from: yourID,
+        const peer = new Peer({
+          initiator: true,
+          trickle: false,
+          stream: stream,
         });
+        peer.on("signal", (data) => {
+          socket.emit("callUser", {
+            userToCall: id,
+            signalData: data,
+            from: me,
+            name: name,
+          });
+        });
+        peer.on("stream", (stream) => {
+          userVideo.current.srcObject = stream;
+        });
+        socket.on("callAccepted", (signal) => {
+          setCallAccepted(true);
+          peer.signal(signal);
+        });
+        connectionRef.current = peer;
       });
-
-      peer.on("stream", (stream) => {
-        if (partnerVideo.current) {
-          partnerVideo.current.srcObject = stream;
-        }
-      });
-
-      socket.on("callAccepted", (signal) => {
-        setCallAccepted(true);
-        peer.signal(signal);
-      });
-    }
-  }
-
-  function acceptCall() {
+  };
+  const answerCall = () => {
     setCallAccepted(true);
     const peer = new Peer({
       initiator: false,
@@ -98,31 +63,114 @@ const VideoCallPage2 = () => {
       stream: stream,
     });
     peer.on("signal", (data) => {
-      socket.current.emit("acceptCall", { signal: data, to: caller });
+      socket.emit("answerCall", { signal: data, to: caller });
     });
-
     peer.on("stream", (stream) => {
-      partnerVideo.current.srcObject = stream;
+      userVideo.current.srcObject = stream;
     });
-
     peer.signal(callerSignal);
-  }
+    connectionRef.current = peer;
+  };
+  const leaveCall = () => {
+    setCallEnded(true);
+    connectionRef.current.destroy();
+  };
   return (
-    <div>
-      <video ref={userVideo} playsInline autoPlay muted />
-
-      <p onClick={() => callPeer(currentUser._id)}>Call</p>
-
-      <video ref={partnerVideo} playsInline autoPlay muted />
-
-      {receivingCall && !callAccepted && (
-        <div>
-          <p>{caller} is calling you</p>
-          <button onClick={acceptCall}>Accept</button>
+    <>
+      <div>
+        <div className="flex flex-row h-full w-full justify-center gap-[15%] h-screen z-">
+          <div>
+            <div class="flex-grow flex flex-col items-center justify-center h-[90%]">
+              <span className="text-white font-bold text-3xl mb-4">
+                Basic React JS video calling
+              </span>
+              <span className="text-white font-bold text-md mb-4 text-center underline">
+                Copy your ID and anyone using the same server can use it to call
+                you and vice versa!
+              </span>
+              <div class="flex flex-row gap-32">
+                <div class="flex flex-col items-center justify-center w-full">
+                  <div className="video">
+                    {stream && (
+                      <video
+                        className="rounded-full"
+                        playsInline
+                        muted
+                        ref={myVideo}
+                        autoPlay
+                        style={{ width: "300px" }}
+                      />
+                    )}
+                  </div>
+                  <span className="text-white font-bold text-lg mb-4">
+                    {caller}
+                  </span>
+                  <p className="text-white">{me}</p>
+                </div>
+                <div class="flex flex-col items-center justify-center w-full">
+                  {callAccepted && !callEnded ? (
+                    <video
+                      className="rounded-full"
+                      playsInline
+                      ref={userVideo}
+                      autoPlay
+                      style={{ width: "300px" }}
+                    />
+                  ) : (
+                    <div className="flex flex-col justify-center items-center">
+                      <img
+                        src="https://w0.peakpx.com/wallpaper/416/423/HD-wallpaper-devil-boy-in-mask-red-hoodie-dark-background-4ef517.jpg"
+                        class="rounded-full w-[15rem]"
+                      />
+                      <span class="text-white font-bold text-lg">
+                        {idToCall}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <textarea
+                className="text-black"
+                defaultValue={idToCall}
+                onChange={(e) => {
+                  setIdToCall(e.target.value);
+                }}
+              />
+              <div>
+                {callAccepted && !callEnded ? (
+                  <button
+                    className="text-black hover:text-gray-400 mr-6 font-bold bg-white rounded-md m-4 px-2"
+                    onClick={leaveCall}
+                  >
+                    End Call
+                  </button>
+                ) : (
+                  <button
+                    className="text-black hover:text-gray-400 mr-6 font-bold bg-white rounded-md m-4 px-2"
+                    onClick={() => callUser(idToCall)}
+                  >
+                    Call
+                  </button>
+                )}
+              </div>
+              <div className="text-white">
+                {receivingCall && !callAccepted ? (
+                  <div className="caller flex flex-col">
+                    <h1 className="text-white">{caller} is calling...</h1>
+                    <button
+                      className="text-black text-xl hover:text-gray-400 mr-6 font-bold bg-white rounded-md m-4 px-2"
+                      onClick={answerCall}
+                    >
+                      Answer
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </div>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
-};
-
-export default VideoCallPage2;
+}
+export default VideoCall;

@@ -1,14 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Peer } from "peerjs";
-import { Flex, Stack } from "@chakra-ui/react";
-import userAtom from "../atom/userAtom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import userAtom from "../atom/userAtom";
 import { useSocket } from "../context/SocketContext";
-import callAtom from "../atom/callAtom";
-import { IoVideocamOutline } from "react-icons/io5";
+import Peer from "peerjs";
 import { useLocation } from "react-router-dom";
+import callAtom from "../atom/callAtom";
 
-const VideoCallPage = () => {
+const useVideoCall = (peerUserId) => {
   const token = JSON.parse(localStorage.getItem("token"));
   const setUser = useSetRecoilState(userAtom);
   const currentUser = useRecoilValue(userAtom);
@@ -27,8 +25,9 @@ const VideoCallPage = () => {
   const { socket } = useSocket();
   const [recepientId, setRecepientId] = useState("");
 
+  console.log(peerId, "peerId");
   useEffect(() => {
-    const peer = new Peer(currentUser.peerId);
+    const peer = new Peer(peerUserId);
     peer.on("open", (id) => {
       console.log(id, "peer");
       setPeerId(id);
@@ -40,17 +39,6 @@ const VideoCallPage = () => {
     });
     peerInstance.current = peer;
   }, [incomingCall]);
-  useEffect(() => {
-    socket?.on("updateUserPeerId", (data) => {
-      setUser(data);
-      setPeerIdLoad;
-      data.peerId;
-      localStorage.setItem("user", JSON.stringify(data));
-    });
-
-    return () => socket?.off("updateUserPeerId");
-  }, [socket, setUser]);
-  console.log(currentUser.peerId, "cs");
 
   const callUser = async () => {
     console.log("clickec");
@@ -80,21 +68,29 @@ const VideoCallPage = () => {
 
       getUserMedia({ video: true, audio: true }, (mediaStream) => {
         setUserVideo(mediaStream);
-        currentUserVideoRef.current.srcObject = mediaStream;
-        currentUserVideoRef.current.play();
+        if (currentUserVideoRef.current) {
+          currentUserVideoRef.current.srcObject = mediaStream;
+          currentUserVideoRef.current.play();
+        }
 
+        console.log(data.peerId, "pos");
         const call = peerInstance.current.call(data.peerId, mediaStream);
-        call.on("stream", (remoteStream) => {
-          setCall(true);
-          setPartnerVideo(remoteStream);
-          remoteVideoRef.current.srcObject = remoteStream;
-          remoteVideoRef.current.play();
-        });
+        if (call) {
+          console.log(call, "call");
+          call.on("stream", (remoteStream) => {
+            setCall(true);
+            setPartnerVideo(remoteStream);
+            remoteVideoRef.current.srcObject = remoteStream;
+            remoteVideoRef.current.play();
+          });
+        }
       });
     } catch (error) {
       //   showToast("Error", error, "error");
     }
   };
+
+  console.log(currentUserVideoRef.current, "ctry");
 
   const updateUser = async (userId) => {
     try {
@@ -203,55 +199,21 @@ const VideoCallPage = () => {
     updateUser(currentUser._id);
     updateUser(recepientId);
   };
-  const { pathname } = useLocation();
-  console.log(call);
-  return (
-    <div>
-      <IoVideocamOutline
-        size={20}
-        cursor={"pointer"}
-        onClick={() => callUser()}
-      />
-      {/* <button >Call</button> */}
-
-      <Stack>
-        <h1>Current user id is {peerId}</h1>
-        <input
-          type="text"
-          value={remotePeerIdValue}
-          onChange={(e) => setRemotePeerIdValue(e.target.value)}
-        />
-        <div>
-          <video ref={currentUserVideoRef} playsInline muted />
-
-          <Stack cursor={"pointer"} onClick={() => toggleAudio()}>
-            <p>toggle audio</p>
-          </Stack>
-          <Stack cursor={"pointer"} onClick={() => toggleVideo()}>
-            <p>toggle video</p>
-          </Stack>
-          <Stack cursor={"pointer"} onClick={() => endCall()}>
-            <p>end call</p>
-          </Stack>
-        </div>
-        <div
-          style={{
-            borderRadius: "10px",
-            border: "1px solid red",
-            //   visibility: "hidden",
-          }}
-        >
-          <video ref={remoteVideoRef} playsInline muted />
-          user video
-        </div>
-        <Flex gap={10}>
-          {/* Incoming call from {incomingCall.metadata.callerId} */}
-          <button onClick={acceptCall}>Accept</button>
-          <button onClick={rejectCall}>Reject</button>
-        </Flex>
-      </Stack>
-    </div>
-  );
+  return {
+    userVideo,
+    remoteVideoRef,
+    currentUserVideoRef,
+    isAudioMuted,
+    isVideoMuted,
+    incomingCall,
+    callUser,
+    toggleAudio,
+    toggleVideo,
+    endCall,
+    acceptCall,
+    rejectCall,
+    peerId,
+  };
 };
 
-export default VideoCallPage;
+export default useVideoCall;

@@ -1,12 +1,12 @@
 import { Box, Container, Flex } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import UserPage from "./pages/UserPage";
 import PostPage from "./pages/PostPage";
 import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
 import AuthPage from "./pages/AuthPage";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import UpdateProfile from "./pages/UpdateProfile";
 import CreatePost from "./components/CreatePost";
 import ChatPage from "./pages/ChatPage";
@@ -14,10 +14,23 @@ import userAtom from "./atom/userAtom";
 import Logout from "./components/Logout";
 import CreateGroup from "./components/CreateGroup";
 import VideoCallPage from "./pages/VideoCallPage";
+import callAtom from "./atom/callAtom";
+import { useSocket } from "./context/SocketContext";
 
 export default function App() {
+  const { socket } = useSocket();
   const user = useRecoilValue(userAtom);
+  const setUser = useSetRecoilState(userAtom);
   const { pathname } = useLocation();
+  useEffect(() => {
+    socket?.on("updateUserPeerId", (data) => {
+      console.log(data);
+      setUser(data);
+      localStorage.setItem("user", JSON.stringify(data));
+    });
+
+    return () => socket?.off("updateUserPeerId");
+  }, [socket, setUser, user]);
   return (
     <Box position={"relative"} w="full">
       <Container

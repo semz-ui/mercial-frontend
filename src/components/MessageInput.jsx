@@ -13,7 +13,7 @@ import {
   Spinner,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BsFillImageFill, BsSend } from "react-icons/bs";
 import usePreviewImage from "../hooks/usePreviewImage";
 import useShowToast from "../hooks/useShowToast";
@@ -24,26 +24,33 @@ import {
 import { useRecoilState, useRecoilValue } from "recoil";
 import useLoading from "../hooks/useLoading";
 import userAtom from "../atom/userAtom";
+import { FiMic, FiMicOff } from "react-icons/fi";
+import usePreviewAudio from "../hooks/usePreviewAudio";
 
 const MessageInput = ({ setMessages }) => {
   const token = JSON.parse(localStorage.getItem("token"));
   const { handleImageChange, imgUrl, setImgUrl } = usePreviewImage();
+  const { audio, handleAudioChange, setAudio } = usePreviewAudio();
   const { loading, startLoader, stopLoader } = useLoading();
   const { onClose } = useDisclosure();
   const selectedConversation = useRecoilValue(selectedConversationAtom);
   const user = useRecoilValue(userAtom);
   const [conversation, setConversation] = useRecoilState(conversationsAtom);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const mediaRecorder = useRef(null);
   const imageRef = useRef(null);
   const [isSending, setIsSending] = useState(false);
   const [messageText, setMessageText] = useState("");
   const showToast = useShowToast();
-  console.log(selectedConversation._id);
+  console.log(audioBlob);
   const handleSendMessage = async (e) => {
     startLoader();
     e.preventDefault();
-    if (!messageText && !imgUrl) return;
-    if (loading) return;
+    // if (!messageText && !imgUrl && !audioBlob) return;
+    // if (loading) return;
     const isGroup = selectedConversation.isGroup;
+    console.log("clicked");
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/api/message`,
@@ -107,16 +114,55 @@ const MessageInput = ({ setMessages }) => {
       stopLoader();
     }
   };
+
+  const startRecording = () => {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      mediaRecorder.current = new MediaRecorder(stream);
+      mediaRecorder.current.start();
+
+      setIsRecording(true);
+    });
+  };
+
+  if (mediaRecorder.current) {
+    mediaRecorder.current.ondataavailable = (e) => {
+      setAudioBlob(e.data);
+    };
+    mediaRecorder.current.onstop = () => {
+      mediaRecorder.current.ondataavailable = (event) => {
+        const audioChunks = [];
+        audioChunks.push(event.data);
+        const audioBlab = new Blob(audioChunks, { type: "audio/mpeg-3" });
+        console.log(audioBlab, "blalboo");
+        setAudioBlob(audioBlab);
+        setAudio(URL.createObjectURL(audioBlab));
+      };
+    };
+  }
+
+  const stopRecording = () => {
+    mediaRecorder.current.stop();
+    setIsRecording(false);
+  };
   return (
     <Flex gap={2} alignItems={"center"}>
       <form onSubmit={handleSendMessage} style={{ flex: 95 }}>
         <InputGroup>
-          <Input
-            w={"full"}
-            placeholder="Type a message"
-            onChange={(e) => setMessageText(e.target.value)}
-            value={messageText}
-          />
+          {audioBlob ? (
+            // <audio
+            //   controls
+            //   className="audio"
+            //   src={URL.createObjectURL(audioBlob)}
+            // />
+            <Audio song={URL.createObjectURL(audioBlob)} />
+          ) : (
+            <Input
+              w={"full"}
+              placeholder="Type a message"
+              onChange={(e) => setMessageText(e.target.value)}
+              value={messageText}
+            />
+          )}
           <InputRightElement onClick={handleSendMessage} cursor={"pointer"}>
             <BsSend />
           </InputRightElement>
@@ -131,6 +177,13 @@ const MessageInput = ({ setMessages }) => {
           onChange={handleImageChange}
         />
       </Flex>
+      <div>
+        {isRecording ? (
+          <FiMicOff cursor={"pointer"} onClick={stopRecording} />
+        ) : (
+          <FiMic cursor={"pointer"} onClick={startRecording} />
+        )}
+      </div>
       <Modal
         isOpen={imgUrl}
         onClose={() => {

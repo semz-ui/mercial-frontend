@@ -58,6 +58,8 @@ const UserHeader = ({ user }) => {
     setNav(data);
   };
 
+  console.log(currentUser);
+
   const handleGoToChat = () => {
     const messagingYourself = user._id === currentUser._id;
     if (messagingYourself) {
@@ -288,6 +290,7 @@ const UserHeader = ({ user }) => {
           <Text fontWeight={"bold"}>Likes</Text>
         </Flex>
       </Flex>
+      <p onClick={() => navigate("/video-call")}>Video</p>
     </VStack>
   );
 };

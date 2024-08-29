@@ -24,6 +24,7 @@ import useShowToast from "../hooks/useShowToast";
 import useLoading from "../hooks/useLoading";
 import { useSocket } from "../context/SocketContext";
 import { FaAngleLeft } from "react-icons/fa";
+import { IoCallOutline, IoVideocamOutline } from "react-icons/io5";
 
 const MessageContainer = () => {
   const token = JSON.parse(localStorage.getItem("token"));
@@ -218,16 +219,22 @@ const MessageContainer = () => {
       flexDirection={"column"}
     >
       {/* Message header */}
-      <Flex w={"full"} h={12} alignItems={"center"} gap={5}>
-        <FaAngleLeft cursor={"pointer"} onClick={goBack} />
-        <Flex alignItems={"center"} gap={2} justifyContent={"center"}>
-          <Avatar src={selectedConversation?.userProfilePic} size={"sm"} />
-          <Text display={"flex"} alignItems={"center"}>
-            {selectedConversation?.username}
-            {!selectedConversation?.isGroup && (
-              <Image src="/verified.png" w={4} h={4} ml={1} />
-            )}
-          </Text>
+      <Flex alignItems={"center"} px={2}>
+        <Flex w={"full"} h={12} alignItems={"center"} gap={5}>
+          <FaAngleLeft cursor={"pointer"} onClick={goBack} />
+          <Flex alignItems={"center"} gap={2} justifyContent={"center"}>
+            <Avatar src={selectedConversation?.userProfilePic} size={"sm"} />
+            <Text display={"flex"} alignItems={"center"}>
+              {selectedConversation?.username}
+              {!selectedConversation?.isGroup && (
+                <Image src="/verified.png" w={4} h={4} ml={1} />
+              )}
+            </Text>
+          </Flex>
+        </Flex>
+        <Flex gap={5}>
+          <IoVideocamOutline size={20} cursor={"pointer"} />
+          <IoCallOutline size={20} cursor={"pointer"} />
         </Flex>
       </Flex>
 

@@ -97,6 +97,23 @@ const Message = ({ ownMessage, message, previousMessages, lastmessage }) => {
                   )}
                 </Flex>
               )}
+              {message.audio && imgLoaded && (
+                <Flex mt={5} w={"200px"}>
+                  <audio controls src={message.audio} />
+                  {!message.text && (
+                    <Box
+                      alignSelf={"flex-end"}
+                      ml={1}
+                      color={message.seen ? "blue.400" : ""}
+                      // fontWeight={"bold"}
+                      position={"sticky"}
+                      marginLeft={"-20px"}
+                    >
+                      <BsCheck2All size={16} />
+                    </Box>
+                  )}
+                </Flex>
+              )}
             </Flex>
             {isGroup && (
               <Flex>
