@@ -31,6 +31,8 @@ export default function App() {
 
     return () => socket?.off("updateUserPeerId");
   }, [socket, setUser, user]);
+
+  console.log(user, "userrr");
   return (
     <Box position={"relative"} w="full">
       <Container

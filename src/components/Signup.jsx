@@ -15,7 +15,7 @@ import {
   Link,
   useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useSetRecoilState } from "recoil";
 import userAtom from "../atom/userAtom";

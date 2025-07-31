@@ -8,7 +8,6 @@ const AuthPage = () => {
   const toggleScreen = () => {
     setScreen(screen === "Login" ? "Signup" : "Login");
   };
-  console.log(screen);
   return (
     <>
       {screen === "Login" ? (

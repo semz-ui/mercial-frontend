@@ -65,6 +65,7 @@ const MessageInput = ({ setMessages }) => {
                 message: messageText,
                 recipientId: selectedConversation.userId,
                 conversationId: selectedConversation._id,
+                isMock: selectedConversation.mock,
                 img: imgUrl,
                 senderData: {
                   username: user.username,
@@ -82,6 +83,7 @@ const MessageInput = ({ setMessages }) => {
                 message: messageText,
                 recipientId: selectedConversation.userId,
                 conversationId: selectedConversation._id,
+                isMock: selectedConversation.mock,
                 img: imgUrl,
               }),
             }

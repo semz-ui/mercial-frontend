@@ -1,5 +1,4 @@
-"use client";
-
+import React from "react";
 import {
   Flex,
   Box,
@@ -100,6 +99,7 @@ export default function Login({ toggleScreen }) {
                   setInputs({ ...inputs, username: e.target.value })
                 }
                 value={inputs.username}
+                placeholder="User Name"
               />
             </FormControl>
             <FormControl isRequired>
@@ -152,7 +152,7 @@ export default function Login({ toggleScreen }) {
               </Button>
             </Stack>
           </Stack>
-          <Stack pt={6} onClick={toggleScreen}>
+          <Stack pt={6} onClick={toggleScreen} data-testid="toggle-button">
             <Text align={"center"}>
               Don't have an account? <Link color={"blue.400"}>Sign Up</Link>
             </Text>
