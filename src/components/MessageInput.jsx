@@ -33,7 +33,9 @@ const MessageInput = ({ setMessages }) => {
   const { audio, handleAudioChange, setAudio } = usePreviewAudio();
   const { loading, startLoader, stopLoader } = useLoading();
   const { onClose } = useDisclosure();
-  const selectedConversation = useRecoilValue(selectedConversationAtom);
+  const [selectedConversation, setSelectedConversation] = useRecoilState(
+    selectedConversationAtom
+  );
   const user = useRecoilValue(userAtom);
   const [conversation, setConversation] = useRecoilState(conversationsAtom);
   const [isRecording, setIsRecording] = useState(false);
@@ -43,7 +45,7 @@ const MessageInput = ({ setMessages }) => {
   const [isSending, setIsSending] = useState(false);
   const [messageText, setMessageText] = useState("");
   const showToast = useShowToast();
-  console.log(audioBlob);
+  console.log(selectedConversation);
   const handleSendMessage = async (e) => {
     startLoader();
     e.preventDefault();
@@ -94,6 +96,11 @@ const MessageInput = ({ setMessages }) => {
         return;
       }
       setMessages((messages) => [...messages, data]);
+      setSelectedConversation((prev) => ({
+        ...prev,
+        _id: data.conversationId,
+        mock: false,
+      }));
       setConversation((prevCon) => {
         const updatedConversation = prevCon.map((con) => {
           if (con._id === selectedConversation._id) {
@@ -110,6 +117,8 @@ const MessageInput = ({ setMessages }) => {
         return updatedConversation;
       });
       setMessageText("");
+      onClose();
+      setImgUrl(null);
     } catch (error) {
       showToast("Error", error.message, "error");
     } finally {
